@@ -1,0 +1,19 @@
+{
+  "name": "hackerRankAlgorithms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "activityNotifications.js",
+  "scripts": {
+    "test": "mocha test -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "binary-search-tree": "^0.2.6"
+  }
+}
