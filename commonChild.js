@@ -38,23 +38,12 @@ function commonChild(s1, s2) {
             //storing in hash means add that letter to every common child that came before
     //now do the same for second letter. inspect the whole of s2
     const hash = {};
+
     const allChildren = getCommonChildren(hash, s1, s2);
     return allChildren.reduce( (accum, cur) => {
         return cur.value.length > accum ? cur.value.length : accum;
     }, 0);
 }   
-
-// function getCommonChildren( hash, first, second ){
-//     if ( hash[ getKey(first, second) != undefined ]) {
-//         return;
-//     }
-//     if ( first.length <= 1 ){
-//         const index = findIndexOfLastMatch( hash, first.charAt(0), second);
-//         const newFirst = first.slice(1);
-        
-//         getCommonChildren( hash, first.slice(1), )
-//     }
-// }
 // hash = {
 //     first_second: [
 //         {
@@ -67,26 +56,39 @@ function commonChild(s1, s2) {
 // }
 function getCommonChildren( hash, first, second ){
     if ( hash[ getKey(first, second) ] != undefined ) {
+        // console.log(`found ${getKey(first, second)} in hash: `, hash[ getKey(first, second) ]);
         return hash[ getKey(first, second) ];
     }
     else if (first.length > 0 && second.length > 0) { //if first has length bigger than one
         const letter = first.charAt(0);
-        // const previousHash = getCommonChildren( hash, first.slice(1), second );
+        const previousHash = getCommonChildren( hash, first.slice(1), second );
         //     //needs to tell me where in second the common child started
         const indices = getAllIndicesOfLetter( second, letter );
-        const newCommonChildren = []; 
+        const newCommonChildren = previousHash;
         indices.forEach( (index) => {
-            const commonChildren = getCommonChildren( hash, first.slice(1), second.slice(index + 1) );
+            newCommonChildren.push( {
+                    value: letter,
+                    indexOfFirst: first.length,
+                    indexOfSecond: index
+                }
+            )
+            const commonChildren = getCommonChildren( hash, first.slice(1), second.slice(second.length - index) );
             newCommonChildren.push( 
                 ...commonChildren.map( common => {
                     //probably don't have to add to all children maybe?
-                    return Object.assign({}, common, {indexOfFirst: first.length})
+                    return {
+                        value: letter + common.value,
+                        indexOfFirst: first.length,
+                        indexOfSecond: index
+                    }
                 })
             )
         })
         hash[ getKey(first, second) ] = newCommonChildren;
+        // console.log(`examining ${getKey(first, second)} got:`, newCommonChildren)
         return hash[ getKey(first, second) ];
     } else if (first === '' || second === '') {
+        // console.log(`basecase for ${getKey(first, second)}`);
         return [];
     } else {
         throw Error('inputs do not make sense: ' + first + ' and ' + second);
@@ -105,6 +107,7 @@ function getAllIndicesOfLetter( inStr, letter ){
             result.push( inStr.length - index );
         }
     }
+    // console.log(`result of indices for ${letter} in ${inStr}:`, result)
     return result;
 }
 
@@ -123,7 +126,12 @@ function main() {
     ws.end();
 }
 
-module.exports = {
-    hashString,
-    commonChildren
-}
+console.log(commonChild('ASDFHIASDFASDFI', 'MMQQWMMQMFFDDIMQMQMQWWMQM'))
+
+// module.exports = {
+//     getAllIndicesOfLetter,
+//     getCommonChildren,
+//     getKey,
+//     commonChild
+// }
+// module.exports = commonChild

@@ -1,18 +1,19 @@
 const {expect} = require('chai');
-const {
-    hashString,
-    commonChildren,
-
-} = require('../commonChild');
+// const {
+//     getAllIndicesOfLetter,
+//     getCommonChildren,
+//     getKey,
+//     commonChild,
+// } = require('../commonChild');
+// const stolen = require('../commonChild');
+// const commonChild = stolen.commonChild;
+const commonChild = require('./../commonChild.js')
 
 describe('commonChild', () => {
     beforeEach( () => {
 
     })
-    xit('hashes each string', () => {
-        expect( hashString('') )
-    })
-    describe('commonChildren', () => {
+    xdescribe('commonChildren', () => {
         let hash;  
         beforeEach( () => {
             hash = {};
@@ -51,8 +52,9 @@ describe('commonChild', () => {
             hash = {};
         })
     })
-    xit('', () => {
-
+    it('works', () => {
+        expect( commonChild('SHINCHAN', 'NOHARAAA') ).to.equal(3);
+        expect( commonChild('ASDFHIASDFASDFI', 'MMQQWMMQMFFDDIMQMQMQWWMQM') ).to.equal(4);
     })
     xit('', () => {
 
