@@ -28,41 +28,84 @@ function readLine() {
 
 // Complete the commonChild function below.
 function commonChild(s1, s2) {
-    // hash both strings // why though? why not as you're doing it
+    //start with first letter of s1
+        //if only one letter
+    //find first occurence in s2 of first letter
+        //if no letter, return/hash ''
+    //slice off first letter of s1 and up to first letter of s2
+        //return where the match occurs
+        //recurse on those slices. store in hash for speed.
+            //storing in hash means add that letter to every common child that came before
+    //now do the same for second letter. inspect the whole of s2
+    const hash = {};
+    const allChildren = getCommonChildren(hash, s1, s2);
+    return allChildren.reduce( (accum, cur) => {
+        return cur.value.length > accum ? cur.value.length : accum;
+    }, 0);
+}   
 
-    //start at end 
-    //get all common children
-    //store into hash
-    //recurse on that output by adding one more letter
-
-}
-//slice will take a longer than using pointers, but I hate that.
-// function commonChildren( hash, first, second ){
-//     if (hash[`${first.value}_${second.value}`] != undefined){
-//         return hash[`${first.value}_${second.value}`];
-//     } else if ( first.length === second.length && first.length === 1 ){
-//         return first.value === second.value ? first.value : '' ; 
-//     } else if ( first.length > 1 ){
-//         const newHash = commonChildren( hash, {value: first.value, length: first.length - 1} , second );
-//         hash[`${first.value}_${second.value}`] = '' //fuuuuu
+// function getCommonChildren( hash, first, second ){
+//     if ( hash[ getKey(first, second) != undefined ]) {
+//         return;
+//     }
+//     if ( first.length <= 1 ){
+//         const index = findIndexOfLastMatch( hash, first.charAt(0), second);
+//         const newFirst = first.slice(1);
+        
+//         getCommonChildren( hash, first.slice(1), )
 //     }
 // }
-function commonChildren( hash, first, second ){
-    //bad: hash should store arrays of all common children, not just the max
-    if (hash[`${first}_${second}`] != undefined){
-        return hash[`${first}_${second}`];
-    } else if ( first.length === second.length && first.length === 1 ){
-        return first === second ? first : '' ; 
-    } else if ( first.length > 1 ){
-        const newHash = commonChildren( hash, first.slice(1), second );
-        const letterToInspect = first.charAt(0);
-        //find first occurence of letterToInspect in second and 
-            //add that to all common children in hash[first_'-----(letterToInspect)...]
-        hash[`${first}_${second}`] = 'fuuuuu';
+// hash = {
+//     first_second: [
+//         {
+//             value: stringInCommon,
+//             indexOfFirst: whereCommonChildStartsInFirst,
+//                  //where index is measure from the end char starting with 1
+//             indexOfSecond: whereCommonChildStartsInSecond, 
+//         }
+//     ]
+// }
+function getCommonChildren( hash, first, second ){
+    if ( hash[ getKey(first, second) ] != undefined ) {
+        return hash[ getKey(first, second) ];
+    }
+    else if (first.length > 0 && second.length > 0) { //if first has length bigger than one
+        const letter = first.charAt(0);
+        // const previousHash = getCommonChildren( hash, first.slice(1), second );
+        //     //needs to tell me where in second the common child started
+        const indices = getAllIndicesOfLetter( second, letter );
+        const newCommonChildren = []; 
+        indices.forEach( (index) => {
+            const commonChildren = getCommonChildren( hash, first.slice(1), second.slice(index + 1) );
+            newCommonChildren.push( 
+                ...commonChildren.map( common => {
+                    //probably don't have to add to all children maybe?
+                    return Object.assign({}, common, {indexOfFirst: first.length})
+                })
+            )
+        })
+        hash[ getKey(first, second) ] = newCommonChildren;
+        return hash[ getKey(first, second) ];
+    } else if (first === '' || second === '') {
+        return [];
+    } else {
+        throw Error('inputs do not make sense: ' + first + ' and ' + second);
     }
 }
-function hashString(){
 
+function getKey(first, second){
+    return `${first}_${second}`;
+}
+
+function getAllIndicesOfLetter( inStr, letter ){
+    //optimize by keeping track of this in a hash
+    const result = [];
+    for (let index = 0; index < inStr.length; index += 1){
+        if (inStr.charAt(index) === letter){
+            result.push( inStr.length - index );
+        }
+    }
+    return result;
 }
 
 
