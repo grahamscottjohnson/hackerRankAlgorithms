@@ -2,29 +2,34 @@
 
 'use strict';
 
-const fs = require('fs');
+// const fs = require('fs');
 
-process.stdin.resume();
-process.stdin.setEncoding('utf-8');
+// process.stdin.resume();
+// process.stdin.setEncoding('utf-8');
 
-let inputString = '';
-let currentLine = 0;
+// let inputString = '';
+// let currentLine = 0;
 
-process.stdin.on('data', inputStdin => {
-    inputString += inputStdin;
-});
+// process.stdin.on('data', inputStdin => {
+//     inputString += inputStdin;
+// });
 
-process.stdin.on('end', _ => {
-    inputString = inputString.replace(/\s*$/, '')
-        .split('\n')
-        .map(str => str.replace(/\s*$/, ''));
+// process.stdin.on('end', _ => {
+//     inputString = inputString.replace(/\s*$/, '')
+//         .split('\n')
+//         .map(str => str.replace(/\s*$/, ''));
 
-    main();
-});
+//     main();
+// });
 
-function readLine() {
-    return inputString[currentLine++];
-}
+// function readLine() {
+//     return inputString[currentLine++];
+// }
+
+// 'ABCD'
+// 'ABDC'
+
+//common children: ABC, ABD, AB ... A B C D
 
 // Complete the commonChild function below.
 function commonChild(s1, s2) {
@@ -85,7 +90,7 @@ function getCommonChildren( hash, first, second ){
             )
         })
         hash[ getKey(first, second) ] = newCommonChildren;
-        // console.log(`examining ${getKey(first, second)} got:`, newCommonChildren)
+        console.log(`examining ${getKey(first, second)} got:`, newCommonChildren)
         return hash[ getKey(first, second) ];
     } else if (first === '' || second === '') {
         // console.log(`basecase for ${getKey(first, second)}`);
@@ -112,21 +117,21 @@ function getAllIndicesOfLetter( inStr, letter ){
 }
 
 
-function main() {
-    const ws = fs.createWriteStream(process.env.OUTPUT_PATH);
+// function main() {
+//     const ws = fs.createWriteStream(process.env.OUTPUT_PATH);
 
-    const s1 = readLine();
+//     const s1 = readLine();
 
-    const s2 = readLine();
+//     const s2 = readLine();
 
-    let result = commonChild(s1, s2);
+//     let result = commonChild(s1, s2);
 
-    ws.write(result + "\n");
+//     ws.write(result + "\n");
 
-    ws.end();
-}
+//     ws.end();
+// }
 
-console.log(commonChild('ASDFHIASDFASDFI', 'MMQQWMMQMFFDDIMQMQMQWWMQM'))
+console.log(commonChild('ELGGYJWKTDHLXJRBJLRYEJWVSUFZKYHOIKBGTVUTTOCGMLEXWDSXEBKRZTQUVCJNGKKRMUUBACVOEQKBFFYBUQEMYNENKYYGUZSP', 'FRVIFOVJYQLVZMFBNRUTIYFBMFFFRZVBYINXLDDSVMPWSQGJZYTKMZIPEGMVOUQBKYEWEYVOLSHCMHPAZYTENRNONTJWDANAMFRX'))
 
 // module.exports = {
 //     getAllIndicesOfLetter,
