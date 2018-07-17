@@ -1,8 +1,54 @@
 //https://www.hackerrank.com/challenges/kingdom-division/problem
 
+'use strict';
+
+const fs = require('fs');
+
+process.stdin.resume();
+process.stdin.setEncoding('utf-8');
+
+let inputString = '';
+let currentLine = 0;
+
+process.stdin.on('data', inputStdin => {
+    inputString += inputStdin;
+});
+
+process.stdin.on('end', _ => {
+    inputString = inputString.replace(/\s*$/, '')
+        .split('\n')
+        .map(str => str.replace(/\s*$/, ''));
+
+    main();
+});
+
+function readLine() {
+    return inputString[currentLine++];
+}
+
+class City{
+    constructor(id){
+        this.id = id;
+        this.neighbors = {};
+    }
+    add(city){
+        this.neighbors[city.id] = city;
+    }
+    get(id){
+        return this.neighbors[id];
+    }
+    isLeaf(){
+        return Object.values(this.neighbors).length === 0
+    }
+}
+
+City.connect = (city1, city2) => {
+    city1.add(city2);
+    city2.add(city1);
+}
+
 const makeKingdom = (roads) => {
     const allCities = {};
-    //should assume city 1 is the root?
     roads.forEach( (road) => {
         let [city1Index, city2Index] = road;
         if (city1Index === city2Index){
@@ -10,95 +56,99 @@ const makeKingdom = (roads) => {
         } else {
             const city1 = allCities[city1Index] || new City(city1Index);
             const city2 = allCities[city2Index] || new City(city2Index);
-            if (city1.right){
-                if (city1.left){
-                    throw new Error(`bad input, city should only have two children, found third:, ${city1.id}, ${city1.right.id}, ${city1.left.id}, ${city2.id}`);
-                }
-                city1.left = city2;
-            } else {
-                city1.right = city2;
-            }
+            City.connect(city1, city2);
             allCities[city1Index] = city1;
             allCities[city2Index] = city2;
         }
     })
+    const visited = {};
+    trimCycles(allCities[1], visited);
     return allCities[1];
+}
+
+function trimCycles( city, visited ){   
+    visited[city.id] = true;
+    const newNeighbors = filterNeighbors(visited, city.neighbors);
+    city.neighbors = newNeighbors;
+    Object.values(newNeighbors).forEach( neighbor => {
+        trimCycles(neighbor, visited);
+    });
+
+}
+
+function filterNeighbors(visited, neighbors){
+    const newNeighbors = {};
+    Object.values(neighbors).forEach( (neighbor) => {
+        if (visited[neighbor.id] == undefined){
+            newNeighbors[neighbor.id] = neighbor;
+        }
+    });
+    return newNeighbors;
 }
 
 function kingdomDivision(n, roads) {
     //set up
     const root = makeKingdom(roads);
-    const hash = {};
+    const waysToDivideGivenCity = {};
     //run recusion on node
-    const ways = findNumDivision(hash, root, 'a') + findNumDivision(hash, root, 'b')
+    const ways = kingdomDivisionRecursion(waysToDivideGivenCity, root, 'a') 
+        + kingdomDivisionRecursion(waysToDivideGivenCity, root, 'b')
     return ways % 1000000007;
 }
 
-
-class City{
-    constructor(id, left, right){
-        this.id = id;
-        this.left = left || null;
-        this.right = right || null;
-    }
-    isLeaf(){
-        return !this.left && !this.right;
-    }
-}
-
-function findNumDivision(hash, city, cityTeam, parentTeam){
+function kingdomDivisionRecursion(hash, city, cityTeam, parentTeam){ //teams are 'a' and 'b'
     //base cases
-    if (city === null){
+    if (city == null){
         throw new Error("city can't be null");
     }
-    if (hash[city.id + parentTeam]){
-        return hash[city.id + parentTeam]
-    } else if (city.isLeaf()){
+    if (hash[city.id + cityTeam + parentTeam]){
+        return hash[city.id + cityTeam + parentTeam]
+    }
+    if (city.isLeaf()){
         return cityTeam === parentTeam ? 1 : 0;
-    } else if (city.left === null) {
-        //recursive step
-        return handleNoLeft(hash, city, cityTeam, parentTeam);
-    } else if (city.right === null) {
-        return handleNoRight(hash, city, cityTeam, parentTeam);
     } else {
-        let otherTeam = notTeam(cityTeam);
-        let ways = 0;
-        ways += findNumDivision(hash, city.left, cityTeam, cityTeam) * findNumDivision(hash, city.right, cityTeam, cityTeam);
-        ways += findNumDivision(hash, city.left, cityTeam, cityTeam) * findNumDivision(hash, city.right, otherTeam, cityTeam);
-        ways += findNumDivision(hash, city.left, otherTeam, cityTeam) * findNumDivision(hash, city.right, cityTeam, cityTeam);
-        if (cityTeam === parentTeam && parentTeam !== null){
-            //even though I have no partner with children, parent has me covered, and this is allowed
-            ways += findNumDivision(hash, city.left, otherTeam, cityTeam) * findNumDivision(hash, city.right, otherTeam, cityTeam);
-        }
-        hash[city.id + parentTeam] = ways;
-        return ways % 1000000007;
+        return handleRecursiveStep(hash, city, cityTeam, parentTeam);
     }
 }
-
-function handleNoRight(hash, city, cityTeam, parentTeam){
-    let ways = 0;
+function handleRecursiveStep(hash, city, cityTeam, parentTeam){
     let otherTeam = notTeam(cityTeam);
-    ways += findNumDivision(hash, city.left, cityTeam, cityTeam);
-    if (cityTeam === parentTeam && parentTeam !== null){
-        //even though I have no partner with children, parent has me covered, and this is allowed
-        ways += findNumDivision(hash, city.left, otherTeam, cityTeam);
+    const neighborBothWays = Object.values(city.neighbors).map( (neighbor) => {
+        return kingdomDivisionRecursion(hash, neighbor, cityTeam, cityTeam)
+        + kingdomDivisionRecursion(hash, neighbor, otherTeam, cityTeam);
+    })
+    let ways = neighborBothWays.reduce( (accum, current) => {
+        return (accum * current) % 1000000007;
+    }, 1);
+    if (parentTeam !== cityTeam){
+        const neighborOppositeWays = Object.values(city.neighbors).map( (neighbor) => {
+            return kingdomDivisionRecursion(hash, neighbor, otherTeam, cityTeam);
+        })
+        ways -= neighborOppositeWays.reduce( (accum, current) => {
+            return (accum * current) % 1000000007;
+        }, 1);
     }
-    hash[city.id + parentTeam] = ways;
-    return ways % 1000000007;
-}
-
-function handleNoLeft(hash, city, cityTeam, parentTeam){
-    let ways = 0;
-    let otherTeam = notTeam(cityTeam);
-    ways += findNumDivision(hash, city.right, cityTeam, cityTeam);
-    if (cityTeam === parentTeam && parentTeam !== null){
-        //even though I have no partner with children, parent has me covered, and this is allowed
-        ways += findNumDivision(hash, city.right, otherTeam, cityTeam);
-    }
-    hash[city.id + parentTeam] = ways;
-    return ways % 1000000007;
+    hash[city.id + cityTeam + parentTeam] = ways;
+    return ways;
 }
 
 function notTeam(team){
     return team === 'a' ? 'b' : 'a';
+}
+
+function main() {
+    const ws = fs.createWriteStream(process.env.OUTPUT_PATH);
+
+    const n = parseInt(readLine(), 10);
+
+    let roads = Array(n-1);
+
+    for (let i = 0; i < n-1; i++) {
+        roads[i] = readLine().split(' ').map(roadsTemp => parseInt(roadsTemp, 10));
+    }
+
+    let result = kingdomDivision(n, roads);
+
+    ws.write(result + "\n");
+
+    ws.end();
 }
