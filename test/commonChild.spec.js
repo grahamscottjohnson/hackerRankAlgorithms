@@ -9,7 +9,7 @@ const {expect} = require('chai');
 // const commonChild = stolen.commonChild;
 const commonChild = require('./../commonChild.js')
 
-describe('commonChild', () => {
+xdescribe('commonChild', () => {
     beforeEach( () => {
 
     })
