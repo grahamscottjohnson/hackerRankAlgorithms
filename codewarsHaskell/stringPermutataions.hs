@@ -1,14 +1,11 @@
 import Data.List
-
-
-myDelete _ [] = []
-myDelete target (x:xs) = if x == target
-    then xs
-    else x : (delete target xs)
     
 stringPermutations :: [Char] -> [[Char]]
 stringPermutations [] = [[]]
 stringPermutations str =
+    --filter string into unique letters: https://www.haskell.org/hoogle/?hoogle=nub
     let uniques = nub str
-    in foldl (\acc letter -> acc ++ (map (letter:) (stringPermutations . myDelete letter $ str) ) ) [] uniques
-
+        -- find all permutatations where a particular letter in the string has to come first
+        waysWithLetterFirst letter = map (letter:) (stringPermutations . delete letter $ str)
+        --combine all ways of having any possible letter come first
+    in concat . map waysWithLetterFirst $ uniques
