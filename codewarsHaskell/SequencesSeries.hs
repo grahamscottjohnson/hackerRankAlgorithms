@@ -2,6 +2,11 @@
 
 module Codewars.Kata.Sequences where
     
+    getScore :: Integer -> Integer
+    -- getScore n = myList !! n * 50
+    --     where myList = take 5 $ scanl (+) 0 [1..]
+    getScore n = 50 * foldr (+) 0 [1..n]
+
     -- getScore :: Integer -> Integer
     -- -- getScore n
     -- --     | n == 1 = 50
@@ -15,8 +20,8 @@ module Codewars.Kata.Sequences where
     --           converted :: Int  
     --           converted = fromIntegral(n)
 
-    getScore n = scores !! n
-        where scores = map (\x -> ) repeat 50 
+    -- getScore n = scores !! n
+    --     where scores = map (\x -> ) repeat 50 
 
     -- -- getScoreRec n prev = prev + n * 50
 

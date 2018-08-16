@@ -23,4 +23,7 @@ algo list@(x:xs) = if (countOfThis > fst myTuple)
         countOfThis = length list - length $ filter (/= x) list
         -- count = max (length list - length listOfNotThis) (algo(listOfNotThis))
 
+
+-- frequencySort list = groupBy (==)
+
 testList = [1, 4, 4, 4, 5, 3]
