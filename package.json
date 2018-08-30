@@ -14,6 +14,9 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
-    "binary-search-tree": "^0.2.6"
+    "binary-search-tree": "^0.2.6",
+    "dbly-linked-list": "^0.2.0",
+    "linkedlist": "^1.0.1",
+    "sinon": "^6.1.5"
   }
 }
