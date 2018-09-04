@@ -22,7 +22,14 @@ describe('longestSubstringWithoutDuplication', () => {
       );
     });
     it('returns bing for bobbingbus', () => {
-      expect(longestSubstringWithoutDuplication('bobbingbus')).to.equal('bing');
+      expect(longestSubstringWithoutDuplication('bobbingbus')).to.equal(
+        'ingbus'
+      );
+    });
+    it('returns banter for anttobbanterrent', () => {
+      expect(longestSubstringWithoutDuplication('anttobbanterrent')).to.equal(
+        'banter'
+      );
     });
     afterEach(() => {});
   });
