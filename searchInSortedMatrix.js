@@ -1,37 +1,75 @@
 function searchInSortedMatrix(
   matrix,
   target,
-  minPoint = [0, 0],
-  maxPoint = [matrix.length - 1, matrix[0].length - 1]
+  min = 0,
+  max = Math.max(matrix.length, matrix[0].length) - 1
 ) {
-  //row is up and down
-  // if (isSmall(matrix)) return naiveSearch(matrix, target);
-  while (!isSmall(minPoint, maxPoint)) {
-    const [midRow, midCol] = midPoint(minPoint, maxPoint);
-    const value = matrix[midRow][midCol];
+  if (!matrix[0].length) return [-1, -1];
+  while (max - min > 1) {
+    const mid = averageRoundedUp(min, max);
+    const [r, c] = getBoundedIndex(matrix, mid);
+    const value = matrix[r][c];
     if (value === target) {
-      return [midRow, midCol];
+      return [r, c];
     } else if (target < value) {
-      maxPoint = [midRow, midCol];
+      max = mid;
     } else {
-      const bottomLeft = searchInSortedMatrix(
-        matrix,
-        target,
-        [midRow + 1, minPoint[1]],
-        [maxPoint[0], midCol]
-      );
-      if (bottomLeft[0] !== -1) return bottomLeft;
-      const topRight = searchInSortedMatrix(
-        matrix,
-        target,
-        [minPoint[0], midCol + 1],
-        [midRow, maxPoint[1]]
-      );
-      if (topRight[0] !== -1) return topRight;
-      minPoint = [midRow + 1, midCol + 1];
+      min = mid;
     }
   }
-  return naiveSearch(matrix, target, minPoint, maxPoint);
+  console.log(min, max);
+  const searches = [
+    [min, binarySearchRow(matrix, target, min)],
+    [max, binarySearchRow(matrix, target, max)],
+    [binarySearchColumn(matrix, target, max), max],
+    [binarySearchColumn(matrix, target, min), min],
+  ];
+  let match = [-1, -1];
+  searches.forEach(search => {
+    if (wasSuccessful(search)) {
+      match = search;
+    }
+  });
+  return match;
+}
+
+function getBoundedIndex(matrix, i) {
+  return [Math.min(i, matrix.length - 1), Math.min(i, matrix[0].length - 1)];
+}
+
+function binarySearchRow(matrix, target, row) {
+  if (!matrix[row]) return -1;
+  const getValue = (array, i) => array[i];
+  return binarySearch(matrix[row], target, getValue);
+}
+
+function binarySearchColumn(matrix, target, col) {
+  if (!matrix[0][col]) return -1;
+  const getValue = (data, i) => data[i][col];
+  return binarySearch(matrix, target, getValue);
+}
+
+function binarySearch(data, target, getValue) {
+  let start = 0;
+  let end = data.length - 1;
+  while (start < end - 1) {
+    const current = averageRoundedUp(start, end);
+    const value = getValue(data, current);
+    if (value === target) {
+      return current;
+    } else if (target < value) {
+      end = current;
+    } else {
+      start = current;
+    }
+  }
+  if (getValue(data, start) === target) return start;
+  if (getValue(data, end) === target) return end;
+  return -1;
+}
+
+function wasSuccessful(search) {
+  return search[0] !== -1 && search[1] !== -1;
 }
 
 function isSmall(minPoint, maxPoint) {
@@ -44,7 +82,7 @@ function midPoint(point1, point2) {
   return [average(point1[0], point2[0]), average(point1[1], point2[1])];
 }
 
-function average(start, end) {
+function averageRoundedUp(start, end) {
   return Math.ceil((end + start) / 2);
 }
 
