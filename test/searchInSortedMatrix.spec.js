@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { searchInSortedMatrix } = require('../searchInSortedMatrix');
 
-describe.only('searchInSortedMatrix', () => {
+xdescribe('searchInSortedMatrix', () => {
   beforeEach(() => {});
   it('returns [-1,-1] for an empty matrix', () => {
     expect(searchInSortedMatrix([[]], 0)).to.deep.equal([-1, -1]);
