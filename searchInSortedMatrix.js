@@ -4,6 +4,9 @@ function searchInSortedMatrix(
   min = 0,
   max = Math.max(matrix.length, matrix[0].length) - 1
 ) {
+  //this is all crap. min/max by diagonal does not work since L shape exists for both
+  //log(n + m) might be possible if you deal with L shape for both > and <
+  //otherwise can get (n + m) with Clement's solution
   if (!matrix[0].length) return [-1, -1];
   while (max - min > 1) {
     const mid = averageRoundedUp(min, max);
