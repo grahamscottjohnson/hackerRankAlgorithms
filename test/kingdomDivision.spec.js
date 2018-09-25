@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { runFromFile } = require('./reading');
 const { kingdomDivision } = require('../kingdomDivision');
 
-describe.only('kingdomDivision', () => {
+describe('kingdomDivision', () => {
   beforeEach(() => {});
   it('returns 2 for two connected cities', () => {
     const output = kingdomDivision(2, [[1, 2]]);

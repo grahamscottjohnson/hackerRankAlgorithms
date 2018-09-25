@@ -23,22 +23,55 @@ describe.only('diskStacking', () => {
     const expectedDisks = [[2, 0, 0]];
     expect(diskStacking(inputDisks)).to.deep.equal(expectedDisks);
   });
+  it('works for four disks of random dimensions', () => {
+    const inputDisks = [[2, 7, 3], [5, 5, 1], [6, 11, 115], [3, 10, 12]];
+    const expectedDisks = [[2, 7, 3], [3, 10, 12], [6, 11, 115]];
+    expect(diskStacking(inputDisks)).to.deep.equal(expectedDisks);
+  });
   afterEach(() => {});
 });
 
-describe.only('Disk', () => {
-  describe('projectedUnitValue', () => {
+describe('Disk', () => {
+  describe('sumOfDimensions', () => {
     beforeEach(() => {});
-    it('returns .5 for [1,1,0]', () => {
+    it('returns 2 for [1,1,0]', () => {
       const inputDisk = new Disk([1, 1, 0]);
-      const expectedValue = 0.5;
-      expect(inputDisk.projectedUnitValue).to.deep.equal(expectedValue);
+      const expectedValue = 2;
+      expect(inputDisk.sumOfDimensions).to.deep.equal(expectedValue);
     });
-    it('returns -.5 for [0,-1,-1]', () => {
-      const inputDisk = new Disk([0, -1, -1]);
-      const expectedValue = -0.5;
-      expect(inputDisk.projectedUnitValue).to.deep.equal(expectedValue);
+    // it('returns -.5 for [0,-1,-1]', () => {
+    //   const inputDisk = new Disk([0, -1, -1]);
+    //   const expectedValue = -0.5;
+    //   expect(inputDisk.projectedUnitValue).to.deep.equal(expectedValue);
+    // });
+    afterEach(() => {});
+  });
+  describe('magnitude', () => {
+    beforeEach(() => {});
+    it('returns root2 for [1,1,0]', () => {
+      const inputDisk = new Disk([1, 1, 0]);
+      const expectedValue = Math.sqrt(2);
+      expect(inputDisk.magnitude).to.deep.equal(expectedValue);
     });
+    // it('returns -.5 for [0,-1,-1]', () => {
+    //   const inputDisk = new Disk([0, -1, -1]);
+    //   const expectedValue = -0.5;
+    //   expect(inputDisk.projectedUnitValue).to.deep.equal(expectedValue);
+    // });
+    afterEach(() => {});
+  });
+  describe('distanceFromIdentity', () => {
+    beforeEach(() => {});
+    xit('returns root3 / 2 for [1,1,0]', () => {
+      const inputDisk = new Disk([1, 1, 0]);
+      const expectedValue = Math.sqrt(3) / 2;
+      expect(inputDisk.distanceFromIdentity).to.deep.equal(expectedValue);
+    });
+    // it('returns -.5 for [0,-1,-1]', () => {
+    //   const inputDisk = new Disk([0, -1, -1]);
+    //   const expectedValue = -0.5;
+    //   expect(inputDisk.projectedUnitValue).to.deep.equal(expectedValue);
+    // });
     afterEach(() => {});
   });
 });
