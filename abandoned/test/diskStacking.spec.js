@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { diskStacking, Disk } = require('../diskStacking');
 
-describe.only('diskStacking', () => {
+xdescribe('diskStacking', () => {
   beforeEach(() => {});
   it('works for a single disk', () => {
     const inputDisks = [[1, 0, 0]];
