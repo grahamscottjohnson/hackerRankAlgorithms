@@ -29,14 +29,20 @@ function insertIntoGraph(graph, key, val) {
 }
 
 function getGraphComponentCountAt(graph, node, visited = new Set()) {
-  if (!visited.has(node)) {
-    visited.add(node);
-    const neighbors = Array.from(graph.get(node));
-    return neighbors.reduce((count, neighbor) => {
-      return count + getGraphComponentCountAt(graph, neighbor, visited);
-    }, 1);
+  const stack = [node];
+  let count = 0;
+  while (stack.length > 0) {
+    const currentNode = stack.pop();
+    if (!visited.has(currentNode)) {
+      visited.add(currentNode);
+      count++;
+      const neighbors = Array.from(graph.get(currentNode));
+      neighbors.forEach(neighbor => {
+        stack.push(neighbor);
+      });
+    }
   }
-  return 0;
+  return count;
 }
 exports.getGraphComponentCountAt = getGraphComponentCountAt;
 

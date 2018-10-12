@@ -49,6 +49,12 @@ describe.only('graphComponents.js', () => {
       const expectedOutput = [2, 2];
       expect(output).to.deep.equal(expectedOutput);
     });
+    it('works for HackerRank Testcase 33', () => {
+      const edges = [[1, 6]];
+      const output = componentsInGraph(edges);
+      const expectedOutput = [2, 2];
+      expect(output).to.deep.equal(expectedOutput);
+    });
     afterEach(() => {});
   });
   describe('getGraphComponentCountAt', () => {

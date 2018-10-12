@@ -7,15 +7,19 @@ class City {
     this.id = id;
     this.neighbors = {};
   }
+
   addNeighbor(city) {
     this.neighbors[city.id] = city;
   }
+
   getNeighbor(id) {
     return this.neighbors[id];
   }
+
   isLeaf() {
     return Object.values(this.neighbors).length === 0;
   }
+
   connectTo(city) {
     this.addNeighbor(city);
     city.addNeighbor(this);
@@ -53,7 +57,7 @@ class TraversalCity extends City {
   constructor(id) {
     super(id);
     this.wasVisited = false;
-    this.numberOfWaysToDivide = 2;
+    this.waysToDivide = 2;
   }
 
   becomeVisited() {
