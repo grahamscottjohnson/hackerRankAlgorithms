@@ -37,7 +37,7 @@ describe('kingdomDivision', () => {
     const expectedOutput = 840;
     expect(output).to.equal(expectedOutput);
   });
-  xit('returns 920705005 for input 11', async () => {
+  it('returns 920705005 for input 11', async () => {
     const output = await runFromFile(
       './testData/kingdomDivisionInput11.txt',
       parseAndRunKingdomDivision

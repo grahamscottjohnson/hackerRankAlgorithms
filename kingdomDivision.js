@@ -5,24 +5,60 @@
 class City {
   constructor(id) {
     this.id = id;
-    this.neighbors = {};
+    this.neighbors = new Map();
+    //ways to divide city based on if parent team is same or different as this cities team
+    this.same = 0;
+    this.different = 0;
+  }
+
+  get ways() {
+    return 2 * (this.same + this.different); //*2 because two different teams
   }
 
   addNeighbor(city) {
-    this.neighbors[city.id] = city;
+    this.neighbors.set(city.id, city);
   }
 
   getNeighbor(id) {
-    return this.neighbors[id];
-  }
-
-  isLeaf() {
-    return Object.values(this.neighbors).length === 0;
+    return this.neighbors.get(id);
   }
 
   connectTo(city) {
     this.addNeighbor(city);
     city.addNeighbor(this);
+  }
+
+  filterVisitedNeighbors(visited) {
+    this.neighbors.forEach(city => {
+      if (visited.has(city.id)) {
+        this.neighbors.delete(city.id);
+      }
+    });
+  }
+
+  isLeaf() {
+    return this.neighbors.size === 0;
+  }
+
+  initiliazeDifferent() {
+    if (this.isLeaf()) {
+      this.different = 0;
+    } else {
+      const bothWays = Array.from(this.neighbors).reduce((accum, current) => {
+        return (accum * current.ways) % 1000000007;
+      }, 1);
+      this.different =
+        bothWays -
+        Array.from(this.neighbors).reduce((accum, current) => {
+          return (accum * current.different) % 1000000007;
+        }, 1);
+    }
+  }
+
+  initializeSame() {
+    this.same = Array.from(this.neighbors).reduce((accum, current) => {
+      return (accum * current.ways) % 1000000007;
+    }, 1);
   }
 }
 
@@ -35,7 +71,7 @@ class Kingdom {
 
   initializeCities(n) {
     for (let i = 1; i <= n; i++) {
-      this.cities.set(i, new TraversalCity(i));
+      this.cities.set(i, new City(i));
     }
   }
 
@@ -53,15 +89,59 @@ class Kingdom {
   }
 }
 
-class TraversalCity extends City {
-  constructor(id) {
-    super(id);
-    this.wasVisited = false;
-    this.waysToDivide = 2;
+class KingdomTraverser {
+  constructor(kingdom) {
+    this.visited = new Set();
+    this.kingdom = kingdom;
   }
 
-  becomeVisited() {
-    this.wasVisited = true;
+  traverseKingdomWithCallback(callback) {
+    this.clearVisited();
+    let rootCity = this.kingdom.values()[0];
+    const stack = [rootCity];
+    while (stack.length > 0) {
+      // const city = stack.pop() stack.peek()
+      const id = city.id;
+      city.filterVisitedNeighbors(this.visited);
+      if (!this.visited.has(id)) {
+        this.visited.add(id);
+        callback(city);
+      }
+    }
+    this.kingdom.cities.forEach(city => {
+      rootCity = rootCity || city;
+      const id = city.id;
+      if (!this.visited.has(id)) {
+        this.visited.add(id);
+        city.filterVisitedNeighbors(this.visited);
+        callback(city);
+      }
+    });
+    return rootCity;
+  }
+
+  clearVisited() {
+    this.visited = new Set();
+  }
+}
+
+class KingdomDivisionAlgorithm {
+  constructor(kingdom) {
+    this.visited = new Set();
+    this.cityDivisions = new Map();
+    this.kingdomTraverser = new KingdomTraverser(kingdom);
+  }
+
+  solve() {
+    const rootCity = this.kingdomTraverser.traverseKingdomWithCallback(
+      this.inspectCity.bind(this)
+    );
+    return 2 * rootCity.different;
+  }
+
+  inspectCity(city) {
+    city.initiliazeSame();
+    city.initializeDifferent();
   }
 }
 
