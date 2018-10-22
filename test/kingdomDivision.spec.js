@@ -1,6 +1,29 @@
 const { expect } = require('chai');
 const { runFromFile } = require('./reading');
-const { kingdomDivision } = require('../kingdomDivision');
+const { kingdomDivision, City } = require('../kingdomDivision');
+
+describe('City', () => {
+  it('initializes different', () => {
+    const city1 = new City(1);
+    const city2 = new City(2);
+    city1.addNeighbor(city2);
+    city2.initializeSame();
+    city2.initializeDifferent();
+    expect(city2.different).to.equal(0);
+    city1.initializeDifferent();
+    expect(city1.different).to.equal(1);
+  });
+  it('initializes same', () => {
+    const city1 = new City(1);
+    const city2 = new City(2);
+    city1.addNeighbor(city2);
+    city2.initializeSame();
+    city2.initializeDifferent();
+    expect(city2.same).to.equal(1);
+    city1.initializeSame();
+    expect(city1.same).to.equal(1);
+  });
+});
 
 describe('kingdomDivision', () => {
   beforeEach(() => {});
@@ -43,6 +66,14 @@ describe('kingdomDivision', () => {
       parseAndRunKingdomDivision
     );
     const expectedOutput = 920705005;
+    expect(output).to.equal(expectedOutput);
+  });
+  it.only('returns 838921216 for input 12', async () => {
+    const output = await runFromFile(
+      './testData/kingdomDivisionInput12.txt',
+      parseAndRunKingdomDivision
+    );
+    const expectedOutput = 838921216;
     expect(output).to.equal(expectedOutput);
   });
   afterEach(() => {});

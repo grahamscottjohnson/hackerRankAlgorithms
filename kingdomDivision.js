@@ -5,22 +5,26 @@
 class City {
   constructor(id) {
     this.id = id;
-    this.neighbors = new Map();
+    this._neighbors = new Map();
     //ways to divide city based on if parent team is same or different as this cities team
     this.same = 0;
     this.different = 0;
   }
 
   get ways() {
-    return 2 * (this.same + this.different); //*2 because two different teams
+    return this.same + this.different; //*2 because two different teams
+  }
+
+  get neighbors() {
+    return Array.from(this._neighbors.values());
   }
 
   addNeighbor(city) {
-    this.neighbors.set(city.id, city);
+    this._neighbors.set(city.id, city);
   }
 
   getNeighbor(id) {
-    return this.neighbors.get(id);
+    return this._neighbors.get(id);
   }
 
   connectTo(city) {
@@ -29,35 +33,37 @@ class City {
   }
 
   filterVisitedNeighbors(visited) {
-    this.neighbors.forEach(city => {
+    this._neighbors.forEach(city => {
       if (visited.has(city.id)) {
-        this.neighbors.delete(city.id);
+        this._neighbors.delete(city.id);
       }
     });
   }
 
   isLeaf() {
-    return this.neighbors.size === 0;
+    return this._neighbors.size === 0;
   }
 
-  initiliazeDifferent() {
+  initializeDifferent() {
     if (this.isLeaf()) {
       this.different = 0;
     } else {
-      const bothWays = Array.from(this.neighbors).reduce((accum, current) => {
-        return (accum * current.ways) % 1000000007;
+      const allWays = this.neighbors.reduce((accum, currentNeighbor) => {
+        return (accum * currentNeighbor.ways) % 1000000007;
       }, 1);
-      this.different =
-        bothWays -
-        Array.from(this.neighbors).reduce((accum, current) => {
-          return (accum * current.different) % 1000000007;
-        }, 1);
+      const waysThatStrandThisAlone = this.neighbors.reduce(
+        (accum, currentNeighbor) => {
+          return (accum * currentNeighbor.different) % 1000000007;
+        },
+        1
+      );
+      this.different = allWays - waysThatStrandThisAlone;
     }
   }
 
   initializeSame() {
-    this.same = Array.from(this.neighbors).reduce((accum, current) => {
-      return (accum * current.ways) % 1000000007;
+    this.same = this.neighbors.reduce((accum, currentNeighbor) => {
+      return (accum * currentNeighbor.ways) % 1000000007;
     }, 1);
   }
 }
@@ -67,6 +73,10 @@ class Kingdom {
     this.cities = new Map();
     this.initializeCities(n);
     this.connectAllCities(roads);
+  }
+
+  values() {
+    return this.cities.values();
   }
 
   initializeCities(n) {
@@ -95,28 +105,25 @@ class KingdomTraverser {
     this.kingdom = kingdom;
   }
 
-  traverseKingdomWithCallback(callback) {
+  postOrderTraverseKingdom(callback) {
     this.clearVisited();
-    let rootCity = this.kingdom.values()[0];
+    let rootCity = this.kingdom.values().next().value;
     const stack = [rootCity];
+    stack.peek = function() {
+      return this[this.length - 1];
+    };
     while (stack.length > 0) {
-      // const city = stack.pop() stack.peek()
-      const id = city.id;
-      city.filterVisitedNeighbors(this.visited);
-      if (!this.visited.has(id)) {
-        this.visited.add(id);
-        callback(city);
-      }
-    }
-    this.kingdom.cities.forEach(city => {
-      rootCity = rootCity || city;
+      const city = stack.peek();
       const id = city.id;
       if (!this.visited.has(id)) {
         this.visited.add(id);
         city.filterVisitedNeighbors(this.visited);
+        stack.push(...city.neighbors);
+      } else {
+        stack.pop();
         callback(city);
       }
-    });
+    }
     return rootCity;
   }
 
@@ -127,115 +134,33 @@ class KingdomTraverser {
 
 class KingdomDivisionAlgorithm {
   constructor(kingdom) {
-    this.visited = new Set();
-    this.cityDivisions = new Map();
     this.kingdomTraverser = new KingdomTraverser(kingdom);
   }
 
   solve() {
-    const rootCity = this.kingdomTraverser.traverseKingdomWithCallback(
+    const rootCity = this.kingdomTraverser.postOrderTraverseKingdom(
       this.inspectCity.bind(this)
     );
-    return 2 * rootCity.different;
+    return mod(2 * rootCity.different, 1000000007);
   }
 
   inspectCity(city) {
-    city.initiliazeSame();
+    city.initializeSame();
     city.initializeDifferent();
   }
 }
 
-const makeKingdom = roads => {
-  const allCities = {};
-  roads.forEach(road => {
-    let [city1Index, city2Index] = road;
-    if (city1Index === city2Index) {
-      console.log('bad input, city should not connect to itself');
-    } else {
-      const city1 = allCities[city1Index] || new City(city1Index);
-      const city2 = allCities[city2Index] || new City(city2Index);
-      city1.connectTo(city2);
-      allCities[city1Index] = city1;
-      allCities[city2Index] = city2;
-    }
-  });
-  const visited = {};
-  trimCycles(allCities[1], visited);
-  return allCities[1];
-};
-
-function trimCycles(city, visited) {
-  visited[city.id] = true;
-  const newNeighbors = filterNeighbors(visited, city.neighbors);
-  city.neighbors = newNeighbors;
-  Object.values(newNeighbors).forEach(neighbor => {
-    trimCycles(neighbor, visited);
-  });
-}
-
-function filterNeighbors(visited, neighbors) {
-  const newNeighbors = {};
-  Object.values(neighbors).forEach(neighbor => {
-    if (visited[neighbor.id] == undefined) {
-      newNeighbors[neighbor.id] = neighbor;
-    }
-  });
-  return newNeighbors;
-}
-
 function kingdomDivision(n, roads) {
-  //set up
-  const root = makeKingdom(roads);
-  const waysToDivideGivenCity = {};
-  //run recusion on node
-  const ways =
-    kingdomDivisionRecursion(waysToDivideGivenCity, root, 'a') +
-    kingdomDivisionRecursion(waysToDivideGivenCity, root, 'b');
-  return ways % 1000000007;
+  const kingdom = new Kingdom(n, roads);
+  const algorithm = new KingdomDivisionAlgorithm(kingdom);
+  return algorithm.solve();
 }
 
-function kingdomDivisionRecursion(hash, city, cityTeam, parentTeam) {
-  //teams are 'a' and 'b'
-  //base cases
-  if (city == null) {
-    throw new Error("city can't be null");
-  }
-  if (hash[city.id + cityTeam + parentTeam]) {
-    return hash[city.id + cityTeam + parentTeam];
-  }
-  if (city.isLeaf()) {
-    return cityTeam === parentTeam ? 1 : 0;
-  } else {
-    return handleRecursiveStep(hash, city, cityTeam, parentTeam);
-  }
-}
-function handleRecursiveStep(hash, city, cityTeam, parentTeam) {
-  let otherTeam = notTeam(cityTeam);
-  const neighborBothWays = Object.values(city.neighbors).map(neighbor => {
-    return (
-      kingdomDivisionRecursion(hash, neighbor, cityTeam, cityTeam) +
-      kingdomDivisionRecursion(hash, neighbor, otherTeam, cityTeam)
-    );
-  });
-  let ways = neighborBothWays.reduce((accum, current) => {
-    return (accum * current) % 1000000007;
-  }, 1);
-  if (parentTeam !== cityTeam) {
-    const neighborOppositeWays = Object.values(city.neighbors).map(neighbor => {
-      return kingdomDivisionRecursion(hash, neighbor, otherTeam, cityTeam);
-    });
-    ways -= neighborOppositeWays.reduce((accum, current) => {
-      return (accum * current) % 1000000007;
-    }, 1);
-  }
-  hash[city.id + cityTeam + parentTeam] = ways;
-  return ways;
-}
-
-function notTeam(team) {
-  return team === 'a' ? 'b' : 'a';
+function mod(n, m) {
+  return ((n % m) + m) % m;
 }
 
 module.exports = {
   kingdomDivision,
+  City,
 };
