@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { runFromFile, readFromFile } = require('./reading');
+const { runFromFile, readFromFile } = require('../../test/reading');
 const {
   kingdomDivision,
   City,
@@ -76,13 +76,6 @@ describe('kingdomDivision', () => {
     const expectedOutput = 2;
     expect(output).to.equal(expectedOutput);
   });
-  it('returns 2 for one root city with two neighbors using TestWays', async () => {
-    const input = [3, [[1, 2], [1, 3]]];
-    const algo = new KingdomDivisionAlgorithm(...input);
-    const output = algo.solveWithTestWays();
-    const expectedOutput = 2;
-    expect(output).to.equal(expectedOutput);
-  });
   it('returns 2 for one root city with three neighbors', () => {
     const output = kingdomDivision(4, [[1, 2], [1, 3], [1, 4]]);
     const expectedOutput = 2;
@@ -104,15 +97,6 @@ describe('kingdomDivision', () => {
       './testData/kingdomDivisionInput04.txt',
       parseAndRunKingdomDivision
     );
-    const expectedOutput = 840;
-    expect(output).to.equal(expectedOutput);
-  });
-  it('returns 840 for input 4 using TestWays', async () => {
-    const input = parse(
-      await readFromFile('./testData/kingdomDivisionInput12.txt')
-    );
-    const algo = new KingdomDivisionAlgorithm(...input);
-    const output = algo.solveWithTestWays();
     const expectedOutput = 840;
     expect(output).to.equal(expectedOutput);
   });
