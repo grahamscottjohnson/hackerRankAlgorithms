@@ -1,6 +1,10 @@
 const { expect } = require('chai');
-const { runFromFile } = require('./reading');
-const { kingdomDivision, City } = require('../kingdomDivision');
+const { runFromFile, readFromFile } = require('./reading');
+const {
+  kingdomDivision,
+  City,
+  KingdomDivisionAlgorithm,
+} = require('../kingdomDivision');
 
 describe('City', () => {
   it('initializes different', () => {
@@ -25,6 +29,41 @@ describe('City', () => {
   });
 });
 
+describe('Algo.containsCycle', () => {
+  it('returns false for five cities with one root branching in two directions', () => {
+    const input = [5, [[1, 2], [2, 3], [1, 4], [4, 5]]];
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.containsCycle();
+    const expectedOutput = false;
+    expect(output).to.equal(expectedOutput);
+  });
+  it('returns true for simple triangle', () => {
+    const input = [3, [[1, 2], [2, 3], [3, 1]]];
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.containsCycle();
+    const expectedOutput = true;
+    expect(output).to.equal(expectedOutput);
+  });
+  it('returns false for input 4', async () => {
+    const input = parse(
+      await readFromFile('./testData/kingdomDivisionInput04.txt')
+    );
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.containsCycle();
+    const expectedOutput = false;
+    expect(output).to.equal(expectedOutput);
+  });
+  it('returns false for input 12', async () => {
+    const input = parse(
+      await readFromFile('./testData/kingdomDivisionInput12.txt')
+    );
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.containsCycle();
+    const expectedOutput = false;
+    expect(output).to.equal(expectedOutput);
+  });
+});
+
 describe('kingdomDivision', () => {
   beforeEach(() => {});
   it('returns 2 for two connected cities', () => {
@@ -37,11 +76,19 @@ describe('kingdomDivision', () => {
     const expectedOutput = 2;
     expect(output).to.equal(expectedOutput);
   });
+  it('returns 2 for one root city with two neighbors using TestWays', async () => {
+    const input = [3, [[1, 2], [1, 3]]];
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.solveWithTestWays();
+    const expectedOutput = 2;
+    expect(output).to.equal(expectedOutput);
+  });
   it('returns 2 for one root city with three neighbors', () => {
     const output = kingdomDivision(4, [[1, 2], [1, 3], [1, 4]]);
     const expectedOutput = 2;
     expect(output).to.equal(expectedOutput);
   });
+
   it('returns 4 for four cities in a line', () => {
     const output = kingdomDivision(4, [[1, 2], [2, 3], [3, 4]]);
     const expectedOutput = 4;
@@ -60,6 +107,15 @@ describe('kingdomDivision', () => {
     const expectedOutput = 840;
     expect(output).to.equal(expectedOutput);
   });
+  it('returns 840 for input 4 using TestWays', async () => {
+    const input = parse(
+      await readFromFile('./testData/kingdomDivisionInput12.txt')
+    );
+    const algo = new KingdomDivisionAlgorithm(...input);
+    const output = algo.solveWithTestWays();
+    const expectedOutput = 840;
+    expect(output).to.equal(expectedOutput);
+  });
   it('returns 920705005 for input 11', async () => {
     const output = await runFromFile(
       './testData/kingdomDivisionInput11.txt',
@@ -68,7 +124,7 @@ describe('kingdomDivision', () => {
     const expectedOutput = 920705005;
     expect(output).to.equal(expectedOutput);
   });
-  it.only('returns 838921216 for input 12', async () => {
+  it('returns 838921216 for input 12', async () => {
     const output = await runFromFile(
       './testData/kingdomDivisionInput12.txt',
       parseAndRunKingdomDivision
@@ -79,7 +135,7 @@ describe('kingdomDivision', () => {
   afterEach(() => {});
 });
 
-function parseAndRunKingdomDivision(text) {
+function parse(text) {
   let inputString = text
     .replace(/\s*$/, '')
     .split('\n')
@@ -96,9 +152,13 @@ function parseAndRunKingdomDivision(text) {
       .map(roadsTemp => parseInt(roadsTemp, 10));
   }
 
-  return kingdomDivision(n, roads);
+  return [n, roads];
 
   function readLine() {
     return inputString[currentLine++];
   }
+}
+
+function parseAndRunKingdomDivision(text) {
+  return kingdomDivision(...parse(text));
 }

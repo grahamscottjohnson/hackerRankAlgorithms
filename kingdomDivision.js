@@ -7,12 +7,13 @@ class City {
     this.id = id;
     this._neighbors = new Map();
     //ways to divide city based on if parent team is same or different as this cities team
-    this.same = 0;
-    this.different = 0;
+    this.same = null;
+    this.different = null;
+    this.testWays = null;
   }
 
   get ways() {
-    return this.same + this.different; //*2 because two different teams
+    return this.same + this.different;
   }
 
   get neighbors() {
@@ -105,35 +106,62 @@ class KingdomTraverser {
     this.kingdom = kingdom;
   }
 
+  get rootCity() {
+    return this.kingdom.values().next().value;
+  }
+
   postOrderTraverseKingdom(callback) {
     this.clearVisited();
-    let rootCity = this.kingdom.values().next().value;
-    const stack = [rootCity];
+    const stack = [this.rootCity];
     stack.peek = function() {
       return this[this.length - 1];
     };
     while (stack.length > 0) {
       const city = stack.peek();
-      const id = city.id;
-      if (!this.visited.has(id)) {
-        this.visited.add(id);
+      if (!this.visited.has(city.id)) {
+        this.visited.add(city.id);
         city.filterVisitedNeighbors(this.visited);
         stack.push(...city.neighbors);
       } else {
-        stack.pop();
         callback(city);
+        stack.pop();
       }
     }
-    return rootCity;
+    return this.rootCity;
   }
 
   clearVisited() {
     this.visited = new Set();
   }
+
+  containsCycle() {
+    this.clearVisited();
+    let prev = null;
+    const stack = [this.rootCity];
+    stack.peek = function() {
+      return this[this.length - 1];
+    };
+    while (stack.length > 0) {
+      const city = stack.pop();
+      if (this.visited.has(city.id)) {
+        return true;
+      } else {
+        this.visited.add(city.id);
+        city.neighbors.forEach(neighbor => {
+          if (neighbor !== city.prev) {
+            neighbor.prev = city;
+            stack.push(neighbor);
+          }
+        });
+      }
+    }
+    return false;
+  }
 }
 
 class KingdomDivisionAlgorithm {
-  constructor(kingdom) {
+  constructor(n, roads) {
+    const kingdom = new Kingdom(n, roads);
     this.kingdomTraverser = new KingdomTraverser(kingdom);
   }
 
@@ -144,15 +172,26 @@ class KingdomDivisionAlgorithm {
     return mod(2 * rootCity.different, 1000000007);
   }
 
+  solveWithTestWays() {
+    const rootCity = this.kingdomTraverser.postOrderTraverseKingdom(
+      this.inspectCity.bind(this)
+    );
+    return mod(rootCity.testWays, 1000000007);
+  }
+
   inspectCity(city) {
     city.initializeSame();
     city.initializeDifferent();
+    city.initializeTestWays();
+  }
+
+  containsCycle() {
+    return this.kingdomTraverser.containsCycle();
   }
 }
 
 function kingdomDivision(n, roads) {
-  const kingdom = new Kingdom(n, roads);
-  const algorithm = new KingdomDivisionAlgorithm(kingdom);
+  const algorithm = new KingdomDivisionAlgorithm(n, roads);
   return algorithm.solve();
 }
 
@@ -163,4 +202,6 @@ function mod(n, m) {
 module.exports = {
   kingdomDivision,
   City,
+  KingdomTraverser,
+  KingdomDivisionAlgorithm,
 };
