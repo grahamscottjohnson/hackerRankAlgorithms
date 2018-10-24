@@ -8,7 +8,7 @@ const MODULO = 1000000007;
 class LegoBlocks {
   constructor() {
     this.legoBlocksCache = new Map([[0, 0], [1, 1]]);
-    this.rowWaysCache = new Map([[0, bigInt(1)], [1, bigInt(1)]]);
+    this.rowWaysCache = new Map([[0, 1], [1, 1]]);
   }
 
   solve(height, width) {
@@ -19,6 +19,8 @@ class LegoBlocks {
       const result = allTowers
         .subtract(badTowers)
         .mod(MODULO)
+        .add(MODULO)
+        .mod(MODULO)
         .valueOf();
       this.legoBlocksCache.set(width, result);
     }
@@ -26,7 +28,7 @@ class LegoBlocks {
   }
 
   calculateAllTowers(height, width) {
-    const waysInARow = this.divideRowOfSize(width);
+    const waysInARow = bigInt(this.divideRowOfSize(width));
     const allTowers = waysInARow.modPow(height, MODULO);
     return allTowers;
   }
@@ -56,7 +58,7 @@ class LegoBlocks {
       for (let blockSize = 1; blockSize <= MAX_BLOCK_SIZE; blockSize++) {
         ways = ways.add(this.divideRowOfSize(size - blockSize));
       }
-      this.rowWaysCache.set(size, ways.mod(MODULO));
+      this.rowWaysCache.set(size, ways.mod(MODULO).valueOf());
     }
     return this.rowWaysCache.get(size);
   }

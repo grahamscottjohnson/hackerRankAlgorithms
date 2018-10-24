@@ -1,16 +1,20 @@
 const { expect } = require('chai');
 const { LegoBlocks } = require('../legoBlocks');
 const { readFromFile } = require('./reading');
+const bigInt = require('big-integer');
 
 describe.only('legoBlocks', () => {
   beforeEach(() => {});
-  describe('main algorithm', () => {
+
+  function assertSolve(input, expectedOutput) {
+    const output = new LegoBlocks().solve(...input);
+    expect(output).to.equal(expectedOutput);
+  }
+
+  describe('solve', () => {
     beforeEach(() => {});
     it('returns 0 for [0, 2]', () => {
-      const input = [0, 2];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 0;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([0, 2], 0);
     });
     it('returns 0 for [2, 0]', () => {
       const input = [2, 0];
@@ -74,85 +78,68 @@ describe.only('legoBlocks', () => {
         await readFromFile('./testData/legoBlocksOutput01.txt')
       );
       queries.forEach((input, index) => {
-        const output = new LegoBlocks().calculateAllTowers(...input);
-        const expectedOutput = outputs[index];
-        expect(output).to.equal(expectedOutput);
+        assertSolve(input, outputs[index]);
       });
     });
     afterEach(() => {});
   });
 
+  function assertDivideRowOfSize(input, expectedOutput) {
+    const output = new LegoBlocks().divideRowOfSize(input);
+    expect(output).to.equal(expectedOutput);
+  }
+
   describe('divideRowOfSize', () => {
     beforeEach(() => {});
     it('returns 1 for for 0', () => {
-      const input = 0;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 1;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(0, 1);
     });
     it('returns 1 for for 1', () => {
-      const input = 1;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 1;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(1, 1);
     });
     it('returns 2 for for 2', () => {
-      const input = 2;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 2;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(2, 2);
     });
     it('returns 4 for for 3', () => {
-      const input = 3;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 4;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(3, 4);
     });
     it('returns 8 for for 4', () => {
-      const input = 4;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 8;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(4, 8);
     });
     it('returns 15 for for 5', () => {
-      const input = 5;
-      const output = new LegoBlocks().divideRowOfSize(input);
-      const expectedOutput = 15;
-      expect(output).to.equal(expectedOutput);
+      assertDivideRowOfSize(5, 15);
     });
     afterEach(() => {});
   });
+
+  function assertCalculateAllTowers(input, expectedOutput) {
+    const output = new LegoBlocks().calculateAllTowers(...input);
+    expect(output.valueOf()).to.equal(expectedOutput.valueOf());
+  }
 
   describe('caclculateAllTowers', () => {
     beforeEach(() => {});
-    it('returns 8 for for [3, 2]', () => {
-      const input = [3, 2];
-      const output = new LegoBlocks().calculateAllTowers(...input);
-      const expectedOutput = 8;
-      expect(output).to.equal(expectedOutput);
+    it('returns bigInt(8) for for [3, 2]', () => {
+      assertCalculateAllTowers([3, 2], bigInt(8));
     });
     afterEach(() => {});
   });
 
+  function assertCalculateBadTowers(input, expectedOutput) {
+    const output = new LegoBlocks().calculateBadTowers(...input);
+    expect(output.valueOf()).to.equal(expectedOutput.valueOf());
+  }
+
   describe('caclculateBadTowers', () => {
     beforeEach(() => {});
-    it('returns 0 for for [3, 1]', () => {
-      const input = [3, 1];
-      const output = new LegoBlocks().calculateBadTowers(...input);
-      const expectedOutput = 0;
-      expect(output).to.equal(expectedOutput);
+    it('returns 0 for [3, 1]', () => {
+      assertCalculateBadTowers([3, 1], bigInt(0));
     });
-    it('returns 1 for for [3, 2]', () => {
-      const input = [3, 2];
-      const output = new LegoBlocks().calculateBadTowers(...input);
-      const expectedOutput = 1;
-      expect(output).to.equal(expectedOutput);
+    it('returns 1 for [3, 2]', () => {
+      assertCalculateBadTowers([3, 2], bigInt(1));
     });
-    it('returns 7 for for [2,3]', () => {
-      const input = [2, 3];
-      const output = new LegoBlocks().calculateBadTowers(...input);
-      const expectedOutput = 7;
-      expect(output).to.equal(expectedOutput);
+    it('returns 7 for [2,3]', () => {
+      assertCalculateBadTowers([2, 3], bigInt(7));
     });
     afterEach(() => {});
   });
