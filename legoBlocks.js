@@ -12,13 +12,15 @@ class LegoBlocks {
   }
 
   solve(height, width) {
+    //O(width^2 and maybe height if bigInt.pow matters)
+    //solve will recursively be called width times
+    //and will do width work when it runs caclulateBadTowers
     if (height === 0) return 0;
     if (!this.legoBlocksCache.has(width)) {
       const allTowers = this.calculateAllTowers(height, width);
       const badTowers = this.calculateBadTowers(height, width);
       const result = allTowers
         .subtract(badTowers)
-        .mod(MODULO)
         .add(MODULO)
         .mod(MODULO)
         .valueOf();
@@ -28,30 +30,14 @@ class LegoBlocks {
   }
 
   calculateAllTowers(height, width) {
+    //ideally should be O(1) assuming previous memoization
     const waysInARow = bigInt(this.divideRowOfSize(width));
-    const allTowers = waysInARow.modPow(height, MODULO);
+    const allTowers = waysInARow.modPow(height, MODULO); //O(?) //http://peterolson.github.io/BigInteger.js/benchmark/#Exponentiation
     return allTowers;
   }
 
-  calculateBadTowers(height, width) {
-    if (width === 1) return 0;
-    let badTowers = bigInt(0);
-    for (
-      let indexOfVerticalSplit = 1;
-      indexOfVerticalSplit < width;
-      indexOfVerticalSplit++
-    ) {
-      const towersLeftOfSplit = this.solve(height, indexOfVerticalSplit);
-      const towersRightOfSplit = this.calculateAllTowers(
-        height,
-        width - indexOfVerticalSplit
-      );
-      badTowers = badTowers.add(towersRightOfSplit.multiply(towersLeftOfSplit));
-    }
-    return badTowers.mod(MODULO);
-  }
-
   divideRowOfSize(size) {
+    //O(n) where n is the maximum of any input throughout the program
     if (size < 0) return 0;
     if (!this.rowWaysCache.has(size)) {
       let ways = bigInt(0);
@@ -61,6 +47,34 @@ class LegoBlocks {
       this.rowWaysCache.set(size, ways.mod(MODULO).valueOf());
     }
     return this.rowWaysCache.get(size);
+  }
+
+  calculateBadTowers(height, width) {
+    //O(width), assuming legoBlocks has already been memoized
+    if (width === 1) return 0;
+    let badTowers = bigInt(0);
+
+    //IMPROVE this for loop
+
+    for (
+      let indexOfVerticalSplit = 1;
+      indexOfVerticalSplit < width;
+      indexOfVerticalSplit++
+    ) {
+      badTowers = badTowers.add(
+        this.towersWithSplitAt(height, width, indexOfVerticalSplit)
+      );
+    }
+    return badTowers.mod(MODULO);
+  }
+
+  towersWithSplitAt(height, width, splitIndex) {
+    const towersLeftOfSplit = this.solve(height, splitIndex);
+    const towersRightOfSplit = this.calculateAllTowers(
+      height,
+      width - splitIndex
+    );
+    return towersRightOfSplit.multiply(towersLeftOfSplit);
   }
 }
 

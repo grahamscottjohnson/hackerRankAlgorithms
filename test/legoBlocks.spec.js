@@ -3,7 +3,7 @@ const { LegoBlocks } = require('../legoBlocks');
 const { readFromFile } = require('./reading');
 const bigInt = require('big-integer');
 
-describe.only('legoBlocks', () => {
+describe('legoBlocks', () => {
   beforeEach(() => {});
 
   function assertSolve(input, expectedOutput) {
@@ -17,65 +17,46 @@ describe.only('legoBlocks', () => {
       assertSolve([0, 2], 0);
     });
     it('returns 0 for [2, 0]', () => {
-      const input = [2, 0];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 0;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([2, 0], 0);
     });
     it('returns 1 for [1, 1]', () => {
-      const input = [1, 1];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 1;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([1, 1], 1);
     });
     it('returns 1 for [2, 1]', () => {
-      const input = [2, 1];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 1;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([2, 1], 1);
     });
-    it('returns 2 for [1, 2]', () => {
-      const input = [1, 2];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 1; //should it be 1 or 2? does [- -] count as a vertical break? I say yes
-      expect(output).to.equal(expectedOutput);
+    it('returns 1 for [1, 2]', () => {
+      assertSolve([1, 2], 1);
     });
     it('returns 3 for [2, 2]', () => {
-      const input = [2, 2];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 3;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([2, 2], 3);
     });
     it('returns 7 for [3, 2]', () => {
-      const input = [3, 2];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 7;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([3, 2], 7);
     });
     it('returns 9 for [2, 3]', () => {
-      const input = [2, 3];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 9;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([2, 3], 9);
     });
     it('returns 3375 for [4, 4]', () => {
-      const input = [4, 4];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 3375;
-      expect(output).to.equal(expectedOutput);
+      assertSolve([4, 4], 3375);
     });
-    it('returns 3375 for [4, 4]', () => {
-      const input = [4, 4];
-      const output = new LegoBlocks().solve(...input);
-      const expectedOutput = 3375;
-      expect(output).to.equal(expectedOutput);
-    });
-    it('solves Input 1 from HackerRank', async () => {
+    it('solves Input 01 from HackerRank', async () => {
       const queries = parseInput(
         await readFromFile('./testData/legoBlocksInput01.txt')
       );
       const outputs = parseOutput(
         await readFromFile('./testData/legoBlocksOutput01.txt')
+      );
+      queries.forEach((input, index) => {
+        assertSolve(input, outputs[index]);
+      });
+    });
+    xit('solves Input 02 from HackerRank', async () => {
+      const queries = parseInput(
+        await readFromFile('./testData/legoBlocksInput02.txt')
+      );
+      const outputs = parseOutput(
+        await readFromFile('./testData/legoBlocksOutput02.txt')
       );
       queries.forEach((input, index) => {
         assertSolve(input, outputs[index]);

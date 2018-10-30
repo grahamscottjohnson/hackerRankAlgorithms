@@ -24,5 +24,20 @@ async function readFromFile(path) {
   return fileContent;
 }
 
-exports.runFromFile = runFromFile;
-exports.readFromFile = readFromFile;
+function createReader(inputString) {
+  let currentLine = 0;
+  inputString = inputString
+    .trim()
+    .split('\n')
+    .map(str => str.trim());
+
+  return function readLine() {
+    return inputString[currentLine++];
+  };
+}
+
+module.exports = {
+  runFromFile,
+  readFromFile,
+  createReader,
+};
