@@ -82,6 +82,8 @@ function legoBlocks(height, width) {
   return new LegoBlocks().solve(height, width);
 }
 
+//BIGINT for HackerRank
+
 var bigInt = (function(undefined) {
   'use strict';
 

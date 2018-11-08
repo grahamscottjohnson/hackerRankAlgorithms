@@ -1,10 +1,7 @@
 const { expect } = require('chai');
-const {
-  longestCommonSubsequence,
-  findMatchedSubsequence,
-} = require('../longestCommonSubsequence');
+const { longestCommonSubsequence } = require('../longestCommonSubsequence');
 
-xdescribe('longestCommonSubsequence', () => {
+describe('longestCommonSubsequence', () => {
   describe('works for small cases', () => {
     beforeEach(() => {});
     it('returns [] if given an empty string', () => {
@@ -27,19 +24,6 @@ xdescribe('longestCommonSubsequence', () => {
         'A',
         'S',
         'L',
-      ]);
-    });
-    afterEach(() => {});
-  });
-  describe('findMatchedSubsequence', () => {
-    beforeEach(() => {});
-    it('returns [] for no matching first letter', () => {
-      expect(findMatchedSubsequence('BOGOO', 'DO')).to.deep.equal([]);
-    });
-    it('returns ["B", "O"] for BOGOO and HOOBO', () => {
-      expect(findMatchedSubsequence('BOGOO', 'HOOBO')).to.deep.equal([
-        'B',
-        'O',
       ]);
     });
     afterEach(() => {});

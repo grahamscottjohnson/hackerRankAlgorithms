@@ -3,7 +3,7 @@ const { LegoBlocks } = require('../legoBlocks');
 const { readFromFile } = require('./reading');
 const bigInt = require('big-integer');
 
-describe('legoBlocks', () => {
+xdescribe('legoBlocks', () => {
   beforeEach(() => {});
 
   function assertSolve(input, expectedOutput) {

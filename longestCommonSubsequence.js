@@ -1,43 +1,53 @@
 //https://www.algoexpert.io/questions/Longest%20Common%20Subsequence
 
-//solution works, but is O(n^3). Can be done in O(n^2)
+function longestCommonSubsequence(str1, str2) {
+  const matrix = new Matrix(str1.length + 1, str2.length + 1, '');
 
-function longestCommonSubsequence(str1, str2, cache = new Map()) {
-  // extract the first letter of str 1. find LCS for rest of str1 and str2
-  // find a matching letter in str 2. find LCS for rest of str1 and rest of str2 from matched letter. add letter to the LCS
-  // return the greater of the two.
-  if (str1 === '' || str2 === '') return [];
-  if (cache.has(str1 + '_' + str2)) {
-    return cache.get(str1 + '_' + str2);
+  for (let i = 1; i <= str1.length; i++) {
+    for (let j = 1; j <= str2.length; j++) {
+      if (str1.charAt(i - 1) === str2.charAt(j - 1)) {
+        const prevLCS = matrix.get(i - 1, j - 1);
+        const currentLCS = prevLCS + str1.charAt(i - 1);
+        matrix.set(i, j, currentLCS);
+      } else {
+        const prev1 = matrix.get(i - 1, j);
+        const prev2 = matrix.get(i, j - 1);
+        const prev = prev1.length > prev2.length ? prev1 : prev2;
+        matrix.set(i, j, prev);
+      }
+    }
   }
-  const matchedSubsequence = findMatchedSubsequence(str1, str2, cache);
-  const subsequenceWithOutFirstLetter = longestCommonSubsequence(
-    str1.slice(1),
-    str2,
-    cache
-  );
-  const result =
-    subsequenceWithOutFirstLetter.length > matchedSubsequence.length
-      ? subsequenceWithOutFirstLetter
-      : matchedSubsequence;
-  cache.set(str1 + '_' + str2, result);
-  return result;
+  return matrix.get(str1.length, str2.length).split('');
 }
-// findMatchedSubsequence
-function findMatchedSubsequence(str1, str2, cache = new Map()) {
-  const firstLetter = str1.charAt(0);
-  const matchingIndex = str2.indexOf(firstLetter);
-  if (matchingIndex === -1) {
-    return [];
+
+class Matrix {
+  constructor(numRows, numColumns, defaultValue) {
+    this.storage = this.constructDefaultStorage(
+      numRows,
+      numColumns,
+      defaultValue
+    );
   }
-  const restOfMatch = longestCommonSubsequence(
-    str1.slice(1),
-    str2.slice(matchingIndex + 1),
-    cache
-  );
-  return [firstLetter, ...restOfMatch];
+
+  constructDefaultStorage(numRows, numColumns, defaultValue) {
+    const storage = [];
+    for (let i = 0; i < numRows; i++) {
+      storage[i] = [];
+      for (let j = 0; j < numColumns; j++) {
+        storage[i][j] = defaultValue;
+      }
+    }
+    return storage;
+  }
+
+  get(row, col) {
+    return this.storage[row][col];
+  }
+
+  set(row, col, value) {
+    this.storage[row][col] = value;
+  }
 }
 
 // Do not edit the line below.
 exports.longestCommonSubsequence = longestCommonSubsequence;
-exports.findMatchedSubsequence = findMatchedSubsequence;

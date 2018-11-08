@@ -8,7 +8,7 @@ function createAssertFunction(func) {
   };
 }
 
-describe.only('abbreviation', () => {
+xdescribe('abbreviation', () => {
   beforeEach(() => {});
   const assertAbreviation = createAssertFunction(abbreviation);
   it('handles empty input', () => {
