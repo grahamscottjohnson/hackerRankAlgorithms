@@ -13,6 +13,7 @@ class TopologicalSorter {
   }
 
   sort() {
+    //instead of collecting data and then sorting, you can improve time complexity by adding the data as you inspect them during traversal
     try {
       const jobs = this.jobs.slice();
       return jobs.sort((a, b) => {
