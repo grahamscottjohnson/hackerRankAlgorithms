@@ -108,6 +108,45 @@ function testAbbreviate(a, b) {
   }
 }
 
+class Matrix {
+  constructor(numRows, numColumns, defaultValue) {
+    this.storage = this.constructDefaultStorage(
+      numRows,
+      numColumns,
+      defaultValue
+    );
+  }
+
+  constructDefaultStorage(numRows, numColumns, defaultValue) {
+    const storage = [];
+    for (let i = 0; i < numRows; i++) {
+      storage[i] = [];
+      for (let j = 0; j < numColumns; j++) {
+        storage[i][j] = defaultValue;
+      }
+    }
+    return storage;
+  }
+
+  get(row, col) {
+    return this.storage[row][col];
+  }
+
+  set(row, col, value) {
+    this.storage[row][col] = value;
+  }
+}
+
+function abbreviation2(a, b) {
+  const matrix = new Matrix(b.length, a.length, '');
+
+  for (let bIndex = 0; bIndex < b.length; bIndex++) {
+    for (let aIndex = 0; aIndex < a.length; aIndex++) {
+      //
+    }
+  }
+}
+
 module.exports = {
   abbreviation,
 };
