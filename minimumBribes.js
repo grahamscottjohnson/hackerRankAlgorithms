@@ -25,7 +25,9 @@ function readLine() {
 
 // Complete the minimumBribes function below.
 function minimumBribes(swappedLine) {
-  return new Algo().solve(swappedLine);
+  const result = new Algo().solve(swappedLine);
+  console.log(result);
+  return result;
 }
 
 class Algo {
@@ -36,7 +38,7 @@ class Algo {
   revertToDefault() {
     this.numBribes = 0;
     this.swappedLine = [];
-    this.misplaced = []; //expect only 1 or 2 elements in here
+    this.misplaced = new Set(); //expect only 1 or 2 elements in here
     this.visited = new Set();
     this.totalDisplacement = 0;
   }
@@ -54,7 +56,6 @@ class Algo {
       index < this.swappedLine.length && !this.tooChaotic;
       index++
     ) {
-      this.logInfo();
       const num = this.swappedLine[index];
       this.visited.add(num);
       const displacement = num - index - 1;
@@ -63,32 +64,33 @@ class Algo {
   }
 
   handleDisplacement(num, displacement, index) {
-    this.visited.add(num);
     this.removeFromMisplaced(num);
+    this.countBribes(num, displacement);
+    this.handlePositiveMisplacement(index + 1);
+  }
+
+  removeFromMisplaced(num) {
+    this.misplaced.delete(num);
+  }
+
+  countBribes(num, displacement) {
     if (displacement > 2) {
       this.tooChaotic = true;
     } else if (displacement > 0) {
       this.numBribes += displacement;
-      this.handlePositiveMisplacement(index + 1);
-    } else if (displacement <= 0) {
-      if (this.isLargerThanMisplaced(num)) {
-        this.numBribes++;
-      }
-    }
-  }
-
-  removeFromMisplaced(num) {
-    this.misplaced = this.misplaced.filter(val => val !== num);
-  }
-
-  handlePositiveMisplacement(num) {
-    if (!this.visited.has(num)) {
-      this.misplaced.push(num);
+    } else if (this.isLargerThanMisplaced(num)) {
+      this.numBribes++;
     }
   }
 
   isLargerThanMisplaced(num) {
-    return num > Math.max(...this.misplaced) && this.misplaced.length;
+    return num > Math.max(...this.misplaced) && this.misplaced.size;
+  }
+
+  handlePositiveMisplacement(num) {
+    if (!this.visited.has(num)) {
+      this.misplaced.add(num);
+    }
   }
 
   logInfo() {

@@ -9,6 +9,12 @@ function createAssertFunction(func) {
 
 const assertMinimumBribes = createAssertFunction(minimumBribes);
 
+const testAssert = function(input, expectedOutput) {
+  it(`given ${input} returns ${expectedOutput}`, () => {
+    assertMinimumBribes(input, expectedOutput);
+  });
+};
+
 describe.only('minimumBribes', () => {
   beforeEach(() => {});
   it('given [1] returns 0', () => {
@@ -38,6 +44,9 @@ describe.only('minimumBribes', () => {
   it('given [1,4,3,2] returns 3', () => {
     assertMinimumBribes([[1, 4, 3, 2]], 3);
   });
+  it('given [3,4,1,2] returns 4', () => {
+    assertMinimumBribes([[3, 4, 1, 2]], 4);
+  });
   it('given [3,4,2,1] returns 5', () => {
     assertMinimumBribes([[3, 4, 2, 1]], 5);
   });
@@ -45,90 +54,15 @@ describe.only('minimumBribes', () => {
     assertMinimumBribes([[4, 3, 2, 1]], 'Too chaotic');
   });
 
-  //   [2, 3, 4, 1];
+  testAssert([[2, 3, 5, 1, 4]], 4);
 
-  //# - index - 1
-  //see 2
-  //say that 1 bribe has occured since
-  //2-0-1 = 1
-  //track 1 since it is misplaced
-  //see 3
-  //say that 1 bribe has occured
-  //3-1-1 = 1
-  //don't need to track 2 since it's already placed, but it makes me feel weird for wanting to track now
-  //see 4
-  //4-2-1 = 1 => 1 bribe
-  //see 1
-  //1-3-1 = -3 => 0 bribes
-  //total is 3 which is correct
+  testAssert([[2, 3, 5, 4, 1]], 5);
 
-  //   [2,1,4,3]
+  testAssert([[3, 2, 1, 6, 5, 4]], 6);
 
-  //1 => 1bribe
-  //0
-  //1
-  //0
+  testAssert([[3, 4, 1, 5, 6, 2]], 6);
 
-  //   [4,3,2,1]
-
-  //3 => too chaotic
-
-  //   [3,1,2]
-
-  //2
-  //misplaced: 1
-  //-1 => 0
-  //misplaced: 2
-  //-1 => 0
-  //TOTAL 0 (1 + -1)
-
-  //   [3,2,1]
-
-  //2
-  //misplaced: 1
-  //0 => 0 + 1 misplaced
-  //misplaced: 1
-  //-2 => 0
-
-  //   [3,4,1,2]
-  //2
-  //TOTAL 2
-  //2
-  //TOTAL 4
-  //-2
-  //-2
-
-  //   [3,4,2,1]
-  //2
-  //misplaced: 1
-  //2
-  //misplaced: [1,2]
-  //TOTAL 4
-  // -1
-
-  //   [1,4,3,2]
-  //0
-  //2
-  //0
-  //-2
-
-  //[2,3,5,1,4]
-  //1: misplaced [1]
-  //1: misplaced [1]
-  //2: misplaced [1]
-  //0: misplaced [4]
-  //0: []
-  //Result: 4
-
-  //[2,3,5,4,1]
-  //1: misplaced [1]
-  //1: misplaced [1]
-  //2: misplaced [1]
-  //0: +1 misplaced [1]
-  //0: []
-  //Result: 5
-
-  //   [2, 4, 1, 3];
+  testAssert([[1, 2, 5, 3, 7, 8, 6, 4]], 7);
 
   afterEach(() => {});
 });
